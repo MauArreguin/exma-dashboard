@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<!-- saved from url=(0076)file:///C:/Users/mauricio.arreguin/Downloads/dashboard_vsl_exma_final_2.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EXMA · VSL Dashboard</title>
+<link href="./EXMA · VSL Dashboard_listo_files/css2" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0a0a0a;color:#ffffff;font-family:'Syne',sans-serif;min-height:100vh;padding:28px;}
+.db-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px;}
+.db-logo{font-size:10px;font-weight:500;letter-spacing:4px;color:#666666;text-transform:uppercase;margin-bottom:5px;}
+.db-title{font-size:26px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;}
+.db-subtitle{font-size:11px;color:#555555;margin-top:4px;font-family:'DM Mono',monospace;}
+.view-tabs{display:flex;background:#161616;border:1px solid #2a2a2a;border-radius:12px;padding:5px;gap:4px;}
+.v-tab{font-family:'DM Mono',monospace;font-size:13px;letter-spacing:1px;padding:10px 24px;border-radius:8px;border:none;background:transparent;color:#aaaaaa;cursor:pointer;transition:background .2s,color .2s;text-transform:uppercase;font-weight:500;}
+.v-tab:hover{color:#ffffff;background:#222222;}
+.v-tab.active{background:#D4AF37 !important;color:#0a0a0a !important;font-weight:700;}
+.section-label{font-size:10px;letter-spacing:3px;color:#444444;text-transform:uppercase;margin-bottom:14px;font-family:'DM Mono',monospace;}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;}
+.kpi-card{background:#111111;border:1px solid #1e1e1e;border-radius:10px;padding:16px 18px;position:relative;overflow:hidden;}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent,#D4AF37);}
+.kpi-label{font-size:10px;color:#666666;letter-spacing:2px;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:8px;}
+.kpi-val{font-size:26px;font-weight:700;color:#ffffff;letter-spacing:-1px;line-height:1;}
+.kpi-sub{font-size:11px;color:#555555;margin-top:6px;font-family:'DM Mono',monospace;}
+hr.div{border:none;border-top:1px solid #1c1c1c;margin:22px 0;}
+.nav-bar{display:flex;align-items:center;margin-bottom:18px;background:#111111;border:1px solid #1e1e1e;border-radius:10px;overflow:hidden;}
+.nav-arrow{width:52px;height:52px;border:none;background:transparent;color:#888888;cursor:pointer;font-size:26px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.nav-arrow:hover{background:#1a1a1a;color:#D4AF37;}
+.nav-center{flex:1;text-align:center;padding:0 16px;}
+.nav-period{font-size:15px;font-weight:600;color:#ffffff;text-transform:capitalize;}
+.nav-range{font-size:10px;color:#555555;font-family:'DM Mono',monospace;margin-top:3px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.card{background:#111111;border:1px solid #1e1e1e;border-radius:10px;padding:18px 20px;}
+.card-title{font-size:10px;letter-spacing:2px;color:#555555;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:14px;}
+.chart-wrap{position:relative;width:100%;height:180px;}
+.legend{display:flex;gap:16px;margin-bottom:10px;}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:11px;color:#666666;font-family:'DM Mono',monospace;}
+.leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+.full-card{background:#111111;border:1px solid #1e1e1e;border-radius:10px;padding:18px 20px;margin-top:14px;}
+.table-wrap{overflow-x:auto;}
+table.dt{width:100%;border-collapse:collapse;font-size:11px;}
+table.dt th{text-align:left;color:#555555;font-weight:400;padding:8px 10px;border-bottom:1px solid #1e1e1e;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;white-space:nowrap;}
+table.dt td{padding:8px 10px;border-bottom:1px solid #141414;color:#bbbbbb;font-family:'DM Mono',monospace;font-size:10px;white-space:nowrap;}
+table.dt tr:hover td{background:#141414;}
+table.dt td.gold{color:#D4AF37;font-weight:500;}
+.pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:9px;font-family:'DM Mono',monospace;font-weight:500;}
+.pill.good{background:#1a2a10;color:#639922;}
+.pill.med{background:#2a2010;color:#BA7517;}
+.pill.bad{background:#2a1010;color:#993C1D;}
+#loading{text-align:center;padding:80px 20px;font-family:'DM Mono',monospace;font-size:13px;color:#666666;line-height:2;}
+</style>
+</head>
+<body>
+
+<div id="loading">❌ Error al cargar datos.<br><small>Verifica que el Sheet sea público (Compartir → Cualquiera con el enlace puede ver)</small><br><small style="color:#444">Failed to fetch</small></div>
+
+<div id="main" style="display:none;">
+  <div class="db-header">
+    <div>
+      <div class="db-logo">EXMA · VSL Dashboard</div>
+      <div class="db-title">Performance Report</div>
+      <div class="db-subtitle" id="subtitle">Actualizado: —</div>
+    </div>
+    <div class="view-tabs">
+      <button class="v-tab active" onclick="setView(&#39;day&#39;)">Día</button>
+      <button class="v-tab" onclick="setView(&#39;week&#39;)">Semana</button>
+      <button class="v-tab" onclick="setView(&#39;month&#39;)">Mes</button>
+    </div>
+  </div>
+
+  <div class="section-label" id="mes-label">Totales — acumulado del mes</div>
+  <div class="kpis">
+    <div class="kpi-card" style="--accent:#D4AF37">
+      <div class="kpi-label">Inversión</div>
+      <div class="kpi-val" id="m-inv">—</div>
+      <div class="kpi-sub" id="m-days">—</div>
+    </div>
+    <div class="kpi-card" style="--accent:#639922">
+      <div class="kpi-label">Agendas CRM</div>
+      <div class="kpi-val" id="m-crm">—</div>
+      <div class="kpi-sub" id="m-cxc">—</div>
+    </div>
+    <div class="kpi-card" style="--accent:#185FA5">
+      <div class="kpi-label">Agendas FB</div>
+      <div class="kpi-val" id="m-fb">—</div>
+      <div class="kpi-sub" id="m-cxf">—</div>
+    </div>
+    <div class="kpi-card" style="--accent:#993C1D">
+      <div class="kpi-label">CTR Prom.</div>
+      <div class="kpi-val" id="m-ctr">—</div>
+      <div class="kpi-sub" id="m-cpm">—</div>
+    </div>
+  </div>
+  <div class="kpis">
+    <div class="kpi-card" style="--accent:#639922;border-color:#1e3a10;">
+      <div class="kpi-label">Costo x Agenda CRM</div>
+      <div class="kpi-val" id="m-cpr-crm">—</div>
+      <div class="kpi-sub" id="m-crm-tot">—</div>
+    </div>
+    <div class="kpi-card" style="--accent:#185FA5;border-color:#0e2a4a;">
+      <div class="kpi-label">Costo x Agenda FB</div>
+      <div class="kpi-val" id="m-cpr-fb">—</div>
+      <div class="kpi-sub" id="m-fb-tot">—</div>
+    </div>
+    <div class="kpi-card" style="--accent:#333333">
+      <div class="kpi-label">Impresiones</div>
+      <div class="kpi-val" id="m-imp">—</div>
+      <div class="kpi-sub">acumulado</div>
+    </div>
+    <div class="kpi-card" style="--accent:#333333">
+      <div class="kpi-label">Clics</div>
+      <div class="kpi-val" id="m-clics">—</div>
+      <div class="kpi-sub" id="m-cpc">—</div>
+    </div>
+  </div>
+  <div class="kpis" style="margin-bottom:20px;">
+    <div class="kpi-card" style="--accent:#333333">
+      <div class="kpi-label">Visitas</div>
+      <div class="kpi-val" id="m-vis">—</div>
+      <div class="kpi-sub" id="m-carga">—</div>
+    </div>
+    <div class="kpi-card" style="--accent:#333333">
+      <div class="kpi-label">Conv. Landing</div>
+      <div class="kpi-val" id="m-conv">—</div>
+      <div class="kpi-sub">% promedio</div>
+    </div>
+    <div class="kpi-card" style="--accent:#333333">
+      <div class="kpi-label">CPM Prom.</div>
+      <div class="kpi-val" id="m-cpm2">—</div>
+      <div class="kpi-sub">costo por mil impr.</div>
+    </div>
+    <div class="kpi-card" style="--accent:#333333">
+      <div class="kpi-label">CPC Prom.</div>
+      <div class="kpi-val" id="m-cpc2">—</div>
+      <div class="kpi-sub">costo por clic</div>
+    </div>
+  </div>
+
+  <hr class="div">
+
+  <div class="nav-bar">
+    <button class="nav-arrow" onclick="navPrev()">‹</button>
+    <div class="nav-center">
+      <div class="nav-period" id="nav-period">—</div>
+      <div class="nav-range" id="nav-range">—</div>
+    </div>
+    <button class="nav-arrow" onclick="navNext()">›</button>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">Inversión</div>
+      <div class="chart-wrap"><canvas id="chart-inv"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Agendas</div>
+      <div class="legend">
+        <div class="leg-item"><div class="leg-dot" style="background:#639922"></div>CRM</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#185FA5"></div>FB</div>
+      </div>
+      <div class="chart-wrap" style="height:158px;"><canvas id="chart-ag"></canvas></div>
+    </div>
+  </div>
+
+  <div class="full-card">
+    <div class="card-title" id="tbl-title">Detalle</div>
+    <div class="table-wrap">
+      <table class="dt">
+        <thead><tr>
+          <th>Fecha</th><th>Inversión</th>
+          <th>Ag. CRM</th><th>Costo/Ag. CRM</th>
+          <th>Ag. FB</th><th>Costo/Ag. FB</th>
+          <th>Impr.</th><th>CTR</th><th>CPM</th>
+          <th>Clics</th><th>Visitas</th><th>% Carga</th><th>% Conv.</th>
+        </tr></thead>
+        <tbody id="dt-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="./EXMA · VSL Dashboard_listo_files/chart.umd.js.descarga"></script>
+<script>
+var SHEET_ID   = '1oR6VKUH0ntfh4oupUvffExvHt3CaobZOKwo4z_g7tNk';
+var SHEET_NAME = 'Hoja1';
+var RAW = [];
+var WEEKS, MONTHS, DAYS;
+var view = 'day', dayIdx = 0, weekIdx = 0, monthIdx = 0;
+
+function nv(v){ return parseFloat(String(v||0).replace(/,/g,'').replace(/%/g,'').replace(/\$/g,'')) || 0; }
+function sum(a,fn){ return a.reduce(function(s,r){ return s+fn(r); },0); }
+function avg(a,fn){ return a.length ? sum(a,fn)/a.length : 0; }
+function fmtK(v){ return v>=1000 ? (v/1000).toFixed(1)+'k' : String(v); }
+function getPill(v){ return v<12?'good':v<20?'med':'bad'; }
+
+function getMon(ds){
+  var d=new Date(ds+'T00:00:00'), dy=d.getDay(), diff=dy===0?-6:1-dy, m=new Date(d);
+  m.setDate(d.getDate()+diff); return m.toISOString().slice(0,10);
+}
+function getSun(ms){
+  var d=new Date(ms+'T00:00:00'); d.setDate(d.getDate()+6); return d.toISOString().slice(0,10);
+}
+
+function cargarDatos(){
+  var url='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&sheet='+encodeURIComponent(SHEET_NAME);
+  fetch(url).then(function(res){ return res.text(); }).then(function(txt){
+    var json=JSON.parse(txt.replace(/^[^(]+\(/,'').replace(/\);\s*$/,''));
+    var rows=json.table.rows;
+    RAW=rows.filter(function(r){ return r.c&&r.c[0]&&r.c[0].v; }).map(function(r){
+      var c=r.c, fecha='';
+      if(c[0]&&c[0].v){
+        if(typeof c[0].v==='string'&&c[0].v.indexOf('Date(')===0){
+          var p=c[0].v.replace('Date(','').replace(')','').split(',');
+          fecha=p[0]+'-'+('0'+(parseInt(p[1])+1)).slice(-2)+'-'+('0'+p[2]).slice(-2);
+        } else { fecha=String(c[0].v).slice(0,10); }
+      }
+      return {
+        date:fecha, inv:nv(c[1]&&c[1].v), agCRM:nv(c[2]&&c[2].v), agFB:nv(c[3]&&c[3].v),
+        imp:nv(c[4]&&c[4].v), ctr:nv(c[5]&&c[5].v), cpm:nv(c[6]&&c[6].v),
+        clics:nv(c[7]&&c[7].v), vis:nv(c[8]&&c[8].v), carga:nv(c[9]&&c[9].v),
+        conv:nv(c[10]&&c[10].v), cpc:nv(c[11]&&c[11].v)
+      };
+    }).filter(function(r){ return r.date; }).sort(function(a,b){ return a.date<b.date?-1:1; });
+
+    if(RAW.length===0){
+      document.getElementById('loading').innerHTML='&#9888; El Sheet est&aacute; vac&iacute;o. n8n a&uacute;n no ha enviado datos.';
+      return;
+    }
+    document.getElementById('loading').style.display='none';
+    document.getElementById('main').style.display='block';
+    WEEKS=[...new Set(RAW.map(function(r){ return getMon(r.date); }))].sort();
+    MONTHS=[...new Set(RAW.map(function(r){ return r.date.slice(0,7); }))].sort();
+    DAYS=RAW.map(function(r){ return r.date; }).sort();
+    dayIdx=DAYS.length-1; weekIdx=WEEKS.length-1; monthIdx=MONTHS.length-1;
+    var ult=new Date(DAYS[DAYS.length-1]+'T00:00:00');
+    document.getElementById('subtitle').textContent='Actualizado: '+ult.toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
+    render();
+  }).catch(function(e){
+    document.getElementById('loading').innerHTML='&#10060; Error al cargar datos.<br><small>Verifica que el Sheet sea p&uacute;blico (Compartir &rarr; Cualquiera con el enlace puede ver)</small><br><small style="color:#444">'+e.message+'</small>';
+  });
+}
+
+function setView(v){
+  view=v;
+  document.querySelectorAll('.v-tab').forEach(function(b){
+    var map={day:'D\u00eda',week:'Semana',month:'Mes'};
+    b.classList.toggle('active',b.textContent.trim()===map[v]);
+  });
+  render();
+}
+function navPrev(){
+  if(view==='day') dayIdx=Math.max(0,dayIdx-1);
+  else if(view==='week') weekIdx=Math.max(0,weekIdx-1);
+  else monthIdx=Math.max(0,monthIdx-1);
+  render();
+}
+function navNext(){
+  if(view==='day') dayIdx=Math.min(DAYS.length-1,dayIdx+1);
+  else if(view==='week') weekIdx=Math.min(WEEKS.length-1,weekIdx+1);
+  else monthIdx=Math.min(MONTHS.length-1,monthIdx+1);
+  render();
+}
+function getRows(){
+  if(view==='day') return RAW.filter(function(r){ return r.date===DAYS[dayIdx]; });
+  if(view==='week'){
+    var mon=WEEKS[weekIdx],sun=getSun(mon);
+    return RAW.filter(function(r){ return r.date>=mon&&r.date<=sun; });
+  }
+  return RAW.filter(function(r){ return r.date.indexOf(MONTHS[monthIdx])===0; });
+}
+function getNav(){
+  if(view==='day'){
+    var d=new Date(DAYS[dayIdx]+'T00:00:00');
+    return {p:d.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),r:''};
+  }
+  if(view==='week'){
+    var mon=new Date(WEEKS[weekIdx]+'T00:00:00'),sun=new Date(mon);sun.setDate(sun.getDate()+6);
+    return {p:'Semana del '+mon.toLocaleDateString('es-MX',{day:'numeric',month:'long'}),
+            r:mon.toLocaleDateString('es-MX',{day:'numeric',month:'short'})+' \u2014 '+sun.toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'})};
+  }
+  var ym=MONTHS[monthIdx].split('-'),d=new Date(parseInt(ym[0]),parseInt(ym[1])-1,1);
+  return {p:d.toLocaleDateString('es-MX',{month:'long',year:'numeric'}),r:'Mes completo'};
+}
+function renderKPIs(){
+  var mes=MONTHS[monthIdx],rows=RAW.filter(function(r){ return r.date.indexOf(mes)===0; });
+  var ti=sum(rows,function(r){ return r.inv; }),tc=sum(rows,function(r){ return r.agCRM; }),tf=sum(rows,function(r){ return r.agFB; });
+  var cprCRM=tc>0?ti/tc:0, cprFB=tf>0?ti/tf:0;
+  var ym=mes.split('-'),d=new Date(parseInt(ym[0]),parseInt(ym[1])-1,1);
+  document.getElementById('mes-label').textContent='Totales '+d.toLocaleDateString('es-MX',{month:'long',year:'numeric'})+' \u2014 acumulado del mes';
+  document.getElementById('m-inv').textContent='$'+ti.toFixed(0);
+  document.getElementById('m-days').textContent=rows.length+' d\u00edas registrados';
+  document.getElementById('m-crm').textContent=tc;
+  document.getElementById('m-cxc').textContent='$'+cprCRM.toFixed(2)+' / agenda';
+  document.getElementById('m-fb').textContent=tf;
+  document.getElementById('m-cxf').textContent='$'+cprFB.toFixed(2)+' / agenda';
+  document.getElementById('m-ctr').textContent=avg(rows,function(r){ return r.ctr; }).toFixed(2)+'%';
+  document.getElementById('m-cpm').textContent='CPM: $'+avg(rows,function(r){ return r.cpm; }).toFixed(2);
+  document.getElementById('m-cpr-crm').textContent='$'+cprCRM.toFixed(2);
+  document.getElementById('m-crm-tot').textContent=tc+' agendas totales';
+  document.getElementById('m-cpr-fb').textContent='$'+cprFB.toFixed(2);
+  document.getElementById('m-fb-tot').textContent=tf+' agendas totales';
+  document.getElementById('m-imp').textContent=fmtK(sum(rows,function(r){ return r.imp; }));
+  document.getElementById('m-clics').textContent=fmtK(sum(rows,function(r){ return r.clics; }));
+  document.getElementById('m-cpc').textContent='CPC: $'+avg(rows,function(r){ return r.cpc; }).toFixed(2);
+  document.getElementById('m-vis').textContent=fmtK(sum(rows,function(r){ return r.vis; }));
+  document.getElementById('m-carga').textContent='Carga: '+avg(rows,function(r){ return r.carga; }).toFixed(1)+'%';
+  document.getElementById('m-conv').textContent=avg(rows,function(r){ return r.conv; }).toFixed(2)+'%';
+  document.getElementById('m-cpm2').textContent='$'+avg(rows,function(r){ return r.cpm; }).toFixed(2);
+  document.getElementById('m-cpc2').textContent='$'+avg(rows,function(r){ return r.cpc; }).toFixed(2);
+}
+function mkChart(id,labels,datasets){
+  var el=document.getElementById(id); if(!el) return;
+  var ex=Chart.getChart(el); if(ex) ex.destroy();
+  new Chart(el,{type:'bar',data:{labels:labels,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1a1a',titleColor:'#999',bodyColor:'#ccc',borderColor:'#2a2a2a',borderWidth:1}},
+    scales:{x:{ticks:{color:'#666',font:{family:'DM Mono',size:9},maxRotation:45,autoSkip:false},grid:{color:'#1a1a1a'}},
+            y:{ticks:{color:'#666',font:{family:'DM Mono',size:9}},grid:{color:'#1a1a1a'}}}}});
+}
+function render(){
+  renderKPIs();
+  var rows=getRows(), nav=getNav();
+  document.getElementById('nav-period').textContent=nav.p;
+  document.getElementById('nav-range').textContent=nav.r;
+  var labels=rows.map(function(r){ var d=new Date(r.date+'T00:00:00'); return d.toLocaleDateString('es-MX',{weekday:'short',day:'numeric'}); });
+  mkChart('chart-inv',labels,[{label:'Inversi\u00f3n',data:rows.map(function(r){ return +r.inv.toFixed(2); }),backgroundColor:'rgba(212,175,55,0.2)',borderColor:'#D4AF37',borderWidth:2,borderRadius:4}]);
+  mkChart('chart-ag',labels,[
+    {label:'CRM',data:rows.map(function(r){ return r.agCRM; }),backgroundColor:'rgba(99,153,34,0.4)',borderColor:'#639922',borderWidth:2,borderRadius:4},
+    {label:'FB', data:rows.map(function(r){ return r.agFB;  }),backgroundColor:'rgba(24,95,165,0.4)', borderColor:'#185FA5',borderWidth:2,borderRadius:4}
+  ]);
+  var titles={day:'Detalle del d\u00eda',week:'Detalle de la semana',month:'Detalle del mes'};
+  document.getElementById('tbl-title').textContent=titles[view];
+  var body=document.getElementById('dt-body'); body.innerHTML='';
+  rows.forEach(function(r){
+    var cprCRM=r.agCRM>0?(r.inv/r.agCRM).toFixed(2):'-';
+    var cprFB =r.agFB >0?(r.inv/r.agFB ).toFixed(2):'-';
+    var pCRM=getPill(parseFloat(cprCRM)||99), pFB=getPill(parseFloat(cprFB)||99);
+    var d=new Date(r.date+'T00:00:00');
+    var lbl=d.toLocaleDateString('es-MX',{weekday:'short',day:'numeric',month:'short'});
+    body.innerHTML+='<tr><td class="gold">'+lbl+'</td><td>$'+r.inv.toFixed(2)+'</td><td>'+r.agCRM+'</td><td><span class="pill '+pCRM+'">$'+cprCRM+'</span></td><td>'+r.agFB+'</td><td><span class="pill '+pFB+'">$'+cprFB+'</span></td><td>'+fmtK(r.imp)+'</td><td>'+r.ctr+'%</td><td>$'+r.cpm+'</td><td>'+r.clics+'</td><td>'+r.vis+'</td><td>'+r.carga+'%</td><td>'+r.conv+'%</td></tr>';
+  });
+}
+cargarDatos();
+</script>
+
+
+</body></html>
