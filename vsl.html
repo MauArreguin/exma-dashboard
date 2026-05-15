@@ -283,32 +283,7 @@ function getNav(){
   return {p:d.toLocaleDateString('es-MX',{month:'long',year:'numeric'}),r:'Mes completo'};
 }
 function renderKPIs(){
-  var mes=MONTHS[monthIdx],rows=RAW.filter(function(r){ return r.date.indexOf(mes)===0; });
-  var ti=sum(rows,function(r){ return r.inv; }),tc=sum(rows,function(r){ return r.agCRM; }),tf=sum(rows,function(r){ return r.agFB; });
-  var cprCRM=tc>0?ti/tc:0, cprFB=tf>0?ti/tf:0;
-  var ym=mes.split('-'),d=new Date(parseInt(ym[0]),parseInt(ym[1])-1,1);
-  document.getElementById('mes-label').textContent='Totales '+d.toLocaleDateString('es-MX',{month:'long',year:'numeric'})+' \u2014 acumulado del mes';
-  document.getElementById('m-inv').textContent='$'+ti.toFixed(0);
-  document.getElementById('m-days').textContent=rows.length+' d\u00edas registrados';
-  document.getElementById('m-crm').textContent=tc;
-  document.getElementById('m-cxc').textContent='$'+cprCRM.toFixed(2)+' / agenda';
-  document.getElementById('m-fb').textContent=tf;
-  document.getElementById('m-cxf').textContent='$'+cprFB.toFixed(2)+' / agenda';
-  document.getElementById('m-ctr').textContent=avg(rows,function(r){ return r.ctr; }).toFixed(2)+'%';
-  document.getElementById('m-cpm').textContent='CPM: $'+avg(rows,function(r){ return r.cpm; }).toFixed(2);
-  document.getElementById('m-cpr-crm').textContent='$'+cprCRM.toFixed(2);
-  document.getElementById('m-crm-tot').textContent=tc+' agendas totales';
-  document.getElementById('m-cpr-fb').textContent='$'+cprFB.toFixed(2);
-  document.getElementById('m-fb-tot').textContent=tf+' agendas totales';
-  document.getElementById('m-imp').textContent=fmtK(sum(rows,function(r){ return r.imp; }));
-  document.getElementById('m-clics').textContent=fmtK(sum(rows,function(r){ return r.clics; }));
-  document.getElementById('m-cpc').textContent='CPC: $'+avg(rows,function(r){ return r.cpc; }).toFixed(2);
-  document.getElementById('m-vis').textContent=fmtK(sum(rows,function(r){ return r.vis; }));
-  document.getElementById('m-carga').textContent='Carga: '+avg(rows,function(r){ return r.carga; }).toFixed(1)+'%';
-  document.getElementById('m-conv').textContent=avg(rows,function(r){ return r.conv; }).toFixed(2)+'%';
-  document.getElementById('m-cpm2').textContent='$'+avg(rows,function(r){ return r.cpm; }).toFixed(2);
-  document.getElementById('m-cpc2').textContent='$'+avg(rows,function(r){ return r.cpc; }).toFixed(2);
-}
+  var mes=MONTHS[monthIdx]
 function mkChart(id,labels,datasets){
   var el=document.getElementById(id); if(!el) return;
   var ex=Chart.getChart(el); if(ex) ex.destroy();
@@ -318,16 +293,10 @@ function mkChart(id,labels,datasets){
             y:{ticks:{color:'#666',font:{family:'DM Mono',size:9}},grid:{color:'#1a1a1a'}}}}});
 }
 function render(){
-  // Sincronizar monthIdx con el mes visible en cualquier vista
-  if(view==='day'){
-    var mesDia=DAYS[dayIdx].slice(0,7);
-    var mi=MONTHS.indexOf(mesDia);
-    if(mi>=0) monthIdx=mi;
-  } else if(view==='week'){
-    var mesSem=WEEKS[weekIdx].slice(0,7);
-    var mi2=MONTHS.indexOf(mesSem);
-    if(mi2>=0) monthIdx=mi2;
-  }
+  var rows=getRows(), nav=getNav();
+  renderKPIs();
+  document.getElementById('nav-period').textContent=nav.p;
+  document.getElementById('nav-range').textContent=nav.r;
   renderKPIs();
   var rows=getRows(), nav=getNav();
   document.getElementById('nav-period').textContent=nav.p;
