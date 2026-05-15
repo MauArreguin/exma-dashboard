@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- saved from url=(0076)file:///C:/Users/mauricio.arreguin/Downloads/dashboard_vsl_exma_final_7.html -->
+<!-- saved from url=(0076)file:///C:/Users/mauricio.arreguin/Downloads/dashboard_vsl_exma_final_8.html -->
 <html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EXMA · VSL Dashboard</title>
-<link href="./EXMA · VSL Dashboarddsdsadsadasdasdasd_files/css2" rel="stylesheet">
+<link href="./final final_files/css2" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#0a0a0a;color:#ffffff;font-family:'Syne',sans-serif;min-height:100vh;padding:28px;}
@@ -59,7 +59,7 @@ table.dt td.gold{color:#D4AF37;font-weight:500;}
   <div class="db-header">
     <div>
       <div class="db-logo">EXMA · VSL Dashboard</div>
-      <div class="db-title">Performance Report: by Mau Arreguin Lara</div>
+      <div class="db-title">Performance Report</div>
       <div class="db-subtitle" id="subtitle">Actualizado: —</div>
     </div>
     <div class="view-tabs">
@@ -192,7 +192,7 @@ function nv(v){ return parseFloat(String(v||0).replace(/,/g,'').replace(/%/g,'')
 function sum(a,fn){ return a.reduce(function(s,r){ return s+fn(r); },0); }
 function avg(a,fn){ return a.length ? sum(a,fn)/a.length : 0; }
 function fmtK(v){ return v>=1000 ? (v/1000).toFixed(1)+'k' : String(v); }
-function getPill(v){ return v<12?'good':v<20?'med':'bad'; }
+function getPill(v){ return v<40?'good':v<60?'med':'bad'; }
 
 function getMon(ds){
   var d=new Date(ds+'T00:00:00'), dy=d.getDay(), diff=dy===0?-6:1-dy, m=new Date(d);
@@ -300,8 +300,10 @@ function renderKPIs(rows){
   document.getElementById('m-ctr').textContent=avg(rows,function(r){ return r.ctr; }).toFixed(2)+'%';
   document.getElementById('m-cpm').textContent='CPM: $'+avg(rows,function(r){ return r.cpm; }).toFixed(2);
   document.getElementById('m-cpr-crm').textContent='$'+cprCRM.toFixed(2);
+  document.getElementById('m-cpr-crm').style.color=cprCRM<40?'#639922':cprCRM<60?'#BA7517':'#993C1D';
   document.getElementById('m-crm-tot').textContent=tc+' agendas totales';
   document.getElementById('m-cpr-fb').textContent='$'+cprFB.toFixed(2);
+  document.getElementById('m-cpr-fb').style.color=cprFB<40?'#639922':cprFB<60?'#BA7517':'#993C1D';
   document.getElementById('m-fb-tot').textContent=tf+' agendas totales';
   document.getElementById('m-imp').textContent=fmtK(sum(rows,function(r){ return r.imp; }));
   document.getElementById('m-clics').textContent=fmtK(sum(rows,function(r){ return r.clics; }));
