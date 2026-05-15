@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -77,10 +78,10 @@ table.dt td.gold{color:#D4AF37;font-weight:600;}
     <div>
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;">
         <div id="logo-wrap" style="width:48px;height:48px;border-radius:10px;border:1px solid #222;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
-          <img src="./exma.png" style="width:100%;height:100%;object-fit:contain;">
+          <img src="./exma.png" style="width:150%;height:150%;object-fit:contain;">
         </div>
         <div>
-          <div class="db-logo">EXMA &middot; VSL Dashboard  By: Mauricio Arreguin</div>
+          <div class="db-logo">EXMA &middot; VSL Dashboard &middot; By: Mauricio Arreguin</div>
           <div class="db-title">Performance Report</div>
           <div class="db-subtitle" id="subtitle">Actualizado: &mdash;</div>
         </div>
@@ -303,8 +304,12 @@ function updateGauge(){
     var mrows=RAW.filter(function(r){ return r.date.indexOf(mes)===0; });
     spent=sum(mrows,function(r){ return r.inv; });
     var pace=mrows.length>0?spent/mrows.length:0;
+    var hoy=new Date();
     var daysInMonth=new Date(parseInt(mes.split('-')[0]),parseInt(mes.split('-')[1]),0).getDate();
-    var proj=pace*daysInMonth;
+    // Días restantes = días totales del mes - día de hoy (si estamos en ese mes) o 0
+    var mesActual=hoy.getFullYear()+'-'+('0'+(hoy.getMonth()+1)).slice(-2);
+    var diasRestantes=mes===mesActual ? daysInMonth-hoy.getDate() : 0;
+    var proj=spent+(pace*diasRestantes);
     document.getElementById('budget-pace').textContent='$'+pace.toFixed(0);
     document.getElementById('budget-proj').textContent='$'+proj.toFixed(0);
     var projEl=document.getElementById('budget-proj');
