@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EXMA · VSL Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0d1117;color:#e6edf3;font-family:'Inter',sans-serif;min-height:100vh;padding:24px 32px;}
+/* HEADER */
+.db-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:16px;padding-bottom:20px;border-bottom:1px solid #21262d;}
+.db-logo{font-size:11px;font-weight:500;letter-spacing:3px;color:#8b949e;text-transform:uppercase;margin-bottom:4px;font-family:'DM Mono',monospace;}
+.db-title{font-size:24px;font-weight:700;color:#e6edf3;letter-spacing:-0.5px;}
+.db-subtitle{font-size:12px;color:#8b949e;margin-top:3px;font-family:'DM Mono',monospace;}
+/* TABS */
+.view-tabs{display:flex;background:#161b22;border:1px solid #30363d;border-radius:8px;padding:4px;gap:3px;}
+.v-tab{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:1px;padding:8px 20px;border-radius:6px;border:none;background:transparent;color:#8b949e;cursor:pointer;transition:all .15s;text-transform:uppercase;font-weight:500;}
+.v-tab:hover{color:#e6edf3;background:#21262d;}
+.v-tab.active{background:#D4AF37 !important;color:#0d1117 !important;font-weight:700;}
+/* SECTION LABEL */
+.section-label{font-size:11px;letter-spacing:2px;color:#8b949e;text-transform:uppercase;margin-bottom:14px;font-family:'DM Mono',monospace;font-weight:500;}
+/* KPI GRID */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px;}
+.kpi-card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:18px 20px;position:relative;overflow:hidden;transition:border-color .2s;}
+.kpi-card:hover{border-color:#444c56;}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent,#D4AF37);}
+.kpi-label{font-size:11px;color:#8b949e;letter-spacing:1.5px;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:10px;font-weight:500;}
+.kpi-val{font-size:28px;font-weight:700;color:#e6edf3;letter-spacing:-1px;line-height:1;}
+.kpi-sub{font-size:12px;color:#8b949e;margin-top:7px;font-family:'DM Mono',monospace;}
+/* DIVIDER */
+hr.div{border:none;border-top:1px solid #21262d;margin:24px 0;}
+/* NAV BAR */
+.nav-bar{display:flex;align-items:center;margin-bottom:16px;background:#161b22;border:1px solid #30363d;border-radius:10px;overflow:hidden;}
+.nav-arrow{width:52px;height:52px;border:none;background:transparent;color:#8b949e;cursor:pointer;font-size:24px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.nav-arrow:hover{background:#21262d;color:#D4AF37;}
+.nav-center{flex:1;text-align:center;padding:0 16px;}
+.nav-period{font-size:15px;font-weight:600;color:#e6edf3;text-transform:capitalize;}
+.nav-range{font-size:11px;color:#8b949e;font-family:'DM Mono',monospace;margin-top:3px;}
+/* CHARTS */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:18px 20px;}
+.card-title{font-size:11px;letter-spacing:1.5px;color:#8b949e;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:14px;font-weight:500;}
+.chart-wrap{position:relative;width:100%;height:180px;}
+.legend{display:flex;gap:16px;margin-bottom:10px;}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#8b949e;font-family:'DM Mono',monospace;}
+.leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+/* TABLE */
+.full-card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:18px 20px;margin-top:14px;}
+.table-wrap{overflow-x:auto;}
+table.dt{width:100%;border-collapse:collapse;font-size:12px;}
+table.dt th{text-align:left;color:#8b949e;font-weight:500;padding:9px 12px;border-bottom:1px solid #21262d;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;white-space:nowrap;text-transform:uppercase;}
+table.dt td{padding:10px 12px;border-bottom:1px solid #161b22;color:#c9d1d9;font-family:'DM Mono',monospace;font-size:11px;white-space:nowrap;}
+table.dt tr:hover td{background:#1c2128;}
+table.dt td.gold{color:#D4AF37;font-weight:600;}
+/* PILLS */
+.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-family:'DM Mono',monospace;font-weight:600;}
+.pill.good{background:#1a2e1a;color:#3fb950;border:1px solid #238636;}
+.pill.med{background:#2e2209;color:#d29922;border:1px solid #9e6a03;}
+.pill.bad{background:#2e1a1a;color:#f85149;border:1px solid #da3633;}
+/* LOADING */
+#loading{text-align:center;padding:80px 20px;font-family:'DM Mono',monospace;font-size:13px;color:#8b949e;line-height:2;}
+/* PRESUPUESTO CARDS */
+.bud-card{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:16px 20px;min-width:130px;}
+.bud-label{font-size:10px;color:#8b949e;letter-spacing:2px;font-family:'DM Mono',monospace;margin-bottom:8px;text-transform:uppercase;font-weight:500;}
+.bud-val{font-size:24px;font-weight:700;font-family:'Inter',sans-serif;}
+.bud-sub{font-size:11px;color:#8b949e;font-family:'DM Mono',monospace;margin-top:5px;}
+</style>
+</head>
+<body>
+
+<div id="loading">&#9203; Cargando datos desde Google Sheets&hellip;</div>
+
+<div id="main" style="display:none;">
+  <div class="db-header">
+    <div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;">
+        <div id="logo-wrap" style="width:48px;height:48px;border-radius:10px;border:1px solid #222;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+          <img src="./exma.png" style="width:100%;height:100%;object-fit:contain;">
+        </div>
+        <div>
+          <div class="db-logo">EXMA &middot; VSL Dashboard &middot; By: Mauricio Arreguin</div>
+          <div class="db-title">Performance Report</div>
+          <div class="db-subtitle" id="subtitle">Actualizado: &mdash;</div>
+        </div>
+      </div>
+    </div>
+    <div class="view-tabs">
+      <button class="v-tab active" onclick="setView('day')">D&iacute;a</button>
+      <button class="v-tab" onclick="setView('week')">Semana</button>
+      <button class="v-tab" onclick="setView('month')">Mes</button>
+    </div>
+  </div>
+
+  <!-- PRESUPUESTO -->
+  <div style="background:#161b22;border:1px solid #30363d;border-radius:10px;padding:20px 24px;margin-bottom:20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+      <div class="section-label" style="margin-bottom:0;">Presupuesto &amp; Rentabilidad</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:11px;color:#8b949e;font-family:'DM Mono',monospace;letter-spacing:1px;">PRESUPUESTO MES</span>
+        <div style="display:flex;align-items:center;background:#0d1117;border:1px solid #30363d;border-radius:6px;overflow:hidden;">
+          <span style="padding:6px 10px;font-size:12px;color:#8b949e;font-family:'DM Mono',monospace;">$</span>
+          <input id="budget-input" type="number" value="7500" min="0" step="100"
+            style="background:transparent;border:none;outline:none;color:#D4AF37;font-family:'DM Mono',monospace;font-size:13px;font-weight:600;width:90px;padding:6px 8px 6px 0;"
+            oninput="updateGauge()">
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:32px;flex-wrap:wrap;">
+      <div style="position:relative;flex-shrink:0;">
+        <canvas id="gauge-canvas" width="220" height="120"></canvas>
+        <div style="position:absolute;bottom:18px;left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap;">
+          <div id="gauge-pct" style="font-size:22px;font-weight:700;color:#e6edf3;font-family:'Inter',sans-serif;letter-spacing:-1px;">0%</div>
+          <div id="gauge-sub" style="font-size:10px;color:#8b949e;font-family:'DM Mono',monospace;margin-top:2px;">$0 / $5,000</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;flex:1;flex-wrap:wrap;">
+        <div class="bud-card">
+          <div class="bud-label">Gastado</div>
+          <div id="budget-spent" class="bud-val" style="color:#D4AF37;">$0</div>
+          <div id="budget-spent-pct" class="bud-sub">del presupuesto</div>
+        </div>
+        <div class="bud-card">
+          <div class="bud-label">Restante</div>
+          <div id="budget-left" class="bud-val" style="color:#3fb950;">$5,000</div>
+          <div id="budget-left-pct" class="bud-sub">disponible</div>
+        </div>
+        <div class="bud-card">
+          <div class="bud-label">Ritmo diario</div>
+          <div id="budget-pace" class="bud-val" style="color:#e6edf3;">$0</div>
+          <div class="bud-sub">promedio/d&iacute;a</div>
+        </div>
+        <div class="bud-card">
+          <div class="bud-label">Proyecci&oacute;n mes</div>
+          <div id="budget-proj" class="bud-val" style="color:#e6edf3;">$0</div>
+          <div class="bud-sub">al ritmo actual</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label" id="mes-label">Totales &mdash; acumulado del mes</div>
+  <div class="kpis">
+    <div class="kpi-card" style="--accent:#D4AF37">
+      <div class="kpi-label">Inversi&oacute;n</div>
+      <div class="kpi-val" id="m-inv">&mdash;</div>
+      <div class="kpi-sub" id="m-days">&mdash;</div>
+    </div>
+    <div class="kpi-card" style="--accent:#639922">
+      <div class="kpi-label">Agendas CRM</div>
+      <div class="kpi-val" id="m-crm">&mdash;</div>
+      <div class="kpi-sub" id="m-cxc">&mdash;</div>
+    </div>
+    <div class="kpi-card" style="--accent:#185FA5">
+      <div class="kpi-label">Agendas FB</div>
+      <div class="kpi-val" id="m-fb">&mdash;</div>
+      <div class="kpi-sub" id="m-cxf">&mdash;</div>
+    </div>
+    <div class="kpi-card" style="--accent:#993C1D">
+      <div class="kpi-label">CTR Prom.</div>
+      <div class="kpi-val" id="m-ctr">&mdash;</div>
+      <div class="kpi-sub" id="m-cpm">&mdash;</div>
+    </div>
+  </div>
+  <div class="kpis">
+    <div class="kpi-card" style="--accent:#639922;border-color:#1e3a10;">
+      <div class="kpi-label">Costo x Agenda CRM</div>
+      <div class="kpi-val" id="m-cpr-crm">&mdash;</div>
+      <div class="kpi-sub" id="m-crm-tot">&mdash;</div>
+    </div>
+    <div class="kpi-card" style="--accent:#185FA5;border-color:#0e2a4a;">
+      <div class="kpi-label">Costo x Agenda FB</div>
+      <div class="kpi-val" id="m-cpr-fb">&mdash;</div>
+      <div class="kpi-sub" id="m-fb-tot">&mdash;</div>
+    </div>
+    <div class="kpi-card" style="--accent:#333333">
+      <div class="kpi-label">Impresiones</div>
+      <div class="kpi-val" id="m-imp">&mdash;</div>
+      <div class="kpi-sub">acumulado</div>
+    </div>
+    <div class="kpi-card" style="--accent:#333333">
+      <div class="kpi-label">Clics</div>
+      <div class="kpi-val" id="m-clics">&mdash;</div>
+      <div class="kpi-sub" id="m-cpc">&mdash;</div>
+    </div>
+  </div>
+  <div class="kpis" style="margin-bottom:20px;">
+    <div class="kpi-card" style="--accent:#333333">
+      <div class="kpi-label">Visitas</div>
+      <div class="kpi-val" id="m-vis">&mdash;</div>
+      <div class="kpi-sub" id="m-carga">&mdash;</div>
+    </div>
+    <div class="kpi-card" style="--accent:#333333">
+      <div class="kpi-label">Conv. Landing</div>
+      <div class="kpi-val" id="m-conv">&mdash;</div>
+      <div class="kpi-sub">% promedio</div>
+    </div>
+    <div class="kpi-card" style="--accent:#333333">
+      <div class="kpi-label">CPM Prom.</div>
+      <div class="kpi-val" id="m-cpm2">&mdash;</div>
+      <div class="kpi-sub">costo por mil impr.</div>
+    </div>
+    <div class="kpi-card" style="--accent:#333333">
+      <div class="kpi-label">CPC Prom.</div>
+      <div class="kpi-val" id="m-cpc2">&mdash;</div>
+      <div class="kpi-sub">costo por clic</div>
+    </div>
+  </div>
+
+  <hr class="div">
+
+  <div class="nav-bar">
+    <button class="nav-arrow" onclick="navPrev()">&#8249;</button>
+    <div class="nav-center">
+      <div class="nav-period" id="nav-period">&mdash;</div>
+      <div class="nav-range" id="nav-range">&mdash;</div>
+    </div>
+    <button class="nav-arrow" onclick="navNext()">&#8250;</button>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">Inversi&oacute;n</div>
+      <div class="chart-wrap"><canvas id="chart-inv"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Agendas</div>
+      <div class="legend">
+        <div class="leg-item"><div class="leg-dot" style="background:#639922"></div>CRM</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#185FA5"></div>FB</div>
+      </div>
+      <div class="chart-wrap" style="height:158px;"><canvas id="chart-ag"></canvas></div>
+    </div>
+  </div>
+
+  <div class="full-card">
+    <div class="card-title" id="tbl-title">Detalle</div>
+    <div class="table-wrap">
+      <table class="dt">
+        <thead><tr>
+          <th>Fecha</th><th>Inversi&oacute;n</th>
+          <th>Ag. CRM</th><th>Costo/Ag. CRM</th>
+          <th>Ag. FB</th><th>Costo/Ag. FB</th>
+          <th>Impr.</th><th>CTR</th><th>CPM</th>
+          <th>Clics</th><th>Visitas</th><th>% Carga</th><th>% Conv.</th>
+        </tr></thead>
+        <tbody id="dt-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="./chart.umd.min.js"></script>
+<script>
+var SHEET_ID   = '1oR6VKUH0ntfh4oupUvffExvHt3CaobZOKwo4z_g7tNk';
+var SHEET_NAME = 'Hoja1';
+var RAW = [];
+var WEEKS, MONTHS, DAYS;
+var view = 'day', dayIdx = 0, weekIdx = 0, monthIdx = 0;
+
+function nv(v){ return parseFloat(String(v||0).replace(/,/g,'').replace(/%/g,'').replace(/\$/g,'')) || 0; }
+function sum(a,fn){ return a.reduce(function(s,r){ return s+fn(r); },0); }
+function avg(a,fn){ return a.length ? sum(a,fn)/a.length : 0; }
+function fmtK(v){ return v>=1000 ? (v/1000).toFixed(1)+'k' : String(v); }
+function getPill(v){ return v<40?'good':v<60?'med':'bad'; }
+
+function getMon(ds){
+  var d=new Date(ds+'T00:00:00'), dy=d.getDay(), diff=dy===0?-6:1-dy, m=new Date(d);
+  m.setDate(d.getDate()+diff); return m.toISOString().slice(0,10);
+}
+function getSun(ms){
+  var d=new Date(ms+'T00:00:00'); d.setDate(d.getDate()+6); return d.toISOString().slice(0,10);
+}
+
+function drawGauge(pct, color){
+  var c=document.getElementById('gauge-canvas');
+  if(!c) return;
+  var ctx=c.getContext('2d');
+  var cx=110, cy=105, r=80, lw=16;
+  ctx.clearRect(0,0,220,120);
+  // Fondo
+  ctx.beginPath();ctx.arc(cx,cy,r,Math.PI,0);
+  ctx.strokeStyle='#1e1e1e';ctx.lineWidth=lw;ctx.lineCap='round';ctx.stroke();
+  // Progreso
+  if(pct>0){
+    ctx.beginPath();ctx.arc(cx,cy,r,Math.PI,Math.PI+(Math.PI*Math.min(pct,1)));
+    ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.lineCap='round';ctx.stroke();
+  }
+  // Marcadores $0 y max
+  ctx.fillStyle='#444';ctx.font='9px DM Mono,monospace';
+  ctx.fillText('$0',cx-r-4,cy+16);
+  var bud=parseInt(document.getElementById('budget-input').value)||5000;
+  var maxLbl=bud>=1000?'$'+(bud/1000).toFixed(0)+'k':'$'+bud;
+  ctx.fillText(maxLbl,cx+r-18,cy+16);
+}
+
+function updateGauge(){
+  var bud=parseInt(document.getElementById('budget-input').value)||5000;
+  var spent=0;
+  if(RAW&&RAW.length){
+    var mes=MONTHS&&MONTHS[monthIdx]?MONTHS[monthIdx]:RAW[0].date.slice(0,7);
+    var mrows=RAW.filter(function(r){ return r.date.indexOf(mes)===0; });
+    spent=sum(mrows,function(r){ return r.inv; });
+    var pace=mrows.length>0?spent/mrows.length:0;
+    var hoy=new Date();
+    var daysInMonth=new Date(parseInt(mes.split('-')[0]),parseInt(mes.split('-')[1]),0).getDate();
+    // Días restantes = días totales del mes - día de hoy (si estamos en ese mes) o 0
+    var mesActual=hoy.getFullYear()+'-'+('0'+(hoy.getMonth()+1)).slice(-2);
+    var diasRestantes=mes===mesActual ? daysInMonth-hoy.getDate() : 0;
+    var proj=spent+(pace*diasRestantes);
+    document.getElementById('budget-pace').textContent='$'+pace.toFixed(0);
+    document.getElementById('budget-proj').textContent='$'+proj.toFixed(0);
+    var projEl=document.getElementById('budget-proj');
+    projEl.style.color=proj>bud?'#f85149':proj>bud*0.85?'#d29922':'#3fb950';
+  }
+  var pct=bud>0?spent/bud:0;
+  var color=pct>=1?'#993C1D':pct>=0.85?'#BA7517':'#D4AF37';
+  var left=Math.max(0,bud-spent);
+  document.getElementById('gauge-pct').textContent=Math.round(pct*100)+'%';
+  document.getElementById('gauge-pct').style.color=color;
+  document.getElementById('gauge-sub').textContent='$'+spent.toFixed(0)+' / $'+bud.toLocaleString();
+  document.getElementById('budget-spent').textContent='$'+spent.toFixed(0);
+  document.getElementById('budget-spent-pct').textContent=Math.round(pct*100)+'% del presupuesto';
+  document.getElementById('budget-left').textContent='$'+left.toFixed(0);
+  document.getElementById('budget-left').style.color=left<=0?'#f85149':'#3fb950';
+  document.getElementById('budget-left-pct').textContent=Math.round((1-pct)*100)+'% disponible';
+  drawGauge(pct, color);
+}
+
+function cargarDatos(){
+  var url='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&sheet='+encodeURIComponent(SHEET_NAME);
+  fetch(url).then(function(res){ return res.text(); }).then(function(txt){
+    var json=JSON.parse(txt.replace(/^[^(]+\(/,'').replace(/\);\s*$/,''));
+    var rows=json.table.rows;
+    RAW=rows.filter(function(r){ return r.c&&r.c[0]&&r.c[0].v; }).map(function(r){
+      var c=r.c, fecha='';
+      if(c[0]&&c[0].v){
+        if(typeof c[0].v==='string'&&c[0].v.indexOf('Date(')===0){
+          var p=c[0].v.replace('Date(','').replace(')','').split(',');
+          fecha=p[0]+'-'+('0'+(parseInt(p[1])+1)).slice(-2)+'-'+('0'+p[2]).slice(-2);
+        } else { fecha=String(c[0].v).slice(0,10); }
+      }
+      return {
+        date:fecha, inv:nv(c[1]&&c[1].v), agCRM:nv(c[2]&&c[2].v), agFB:nv(c[3]&&c[3].v),
+        imp:nv(c[4]&&c[4].v), ctr:nv(c[5]&&c[5].v), cpm:nv(c[6]&&c[6].v),
+        clics:nv(c[7]&&c[7].v), vis:nv(c[8]&&c[8].v), carga:nv(c[9]&&c[9].v),
+        conv:nv(c[10]&&c[10].v), cpc:nv(c[11]&&c[11].v)
+      };
+    }).filter(function(r){ return r.date; }).sort(function(a,b){ return a.date<b.date?-1:1; });
+
+    if(RAW.length===0){
+      document.getElementById('loading').innerHTML='&#9888; El Sheet est&aacute; vac&iacute;o.';
+      return;
+    }
+    document.getElementById('loading').style.display='none';
+    document.getElementById('main').style.display='block';
+    WEEKS=[...new Set(RAW.map(function(r){ return getMon(r.date); }))].sort();
+    MONTHS=[...new Set(RAW.map(function(r){ return r.date.slice(0,7); }))].sort();
+    DAYS=RAW.map(function(r){ return r.date; }).sort();
+    dayIdx=DAYS.length-1; weekIdx=WEEKS.length-1; monthIdx=MONTHS.length-1;
+    var ult=new Date(DAYS[DAYS.length-1]+'T00:00:00');
+    document.getElementById('subtitle').textContent='Actualizado: '+ult.toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
+    render();
+  }).catch(function(e){
+    document.getElementById('loading').innerHTML='&#10060; Error al cargar datos.<br><small>Verifica que el Sheet sea p&uacute;blico</small><br><small style="color:#444">'+e.message+'</small>';
+  });
+}
+
+function setView(v){
+  view=v;
+  document.querySelectorAll('.v-tab').forEach(function(b){
+    var map={day:'D\u00eda',week:'Semana',month:'Mes'};
+    b.classList.toggle('active',b.textContent.trim()===map[v]);
+  });
+  render();
+}
+function navPrev(){
+  if(view==='day') dayIdx=Math.max(0,dayIdx-1);
+  else if(view==='week') weekIdx=Math.max(0,weekIdx-1);
+  else monthIdx=Math.max(0,monthIdx-1);
+  render();
+}
+function navNext(){
+  if(view==='day') dayIdx=Math.min(DAYS.length-1,dayIdx+1);
+  else if(view==='week') weekIdx=Math.min(WEEKS.length-1,weekIdx+1);
+  else monthIdx=Math.min(MONTHS.length-1,monthIdx+1);
+  render();
+}
+function getRows(){
+  if(view==='day') return RAW.filter(function(r){ return r.date===DAYS[dayIdx]; });
+  if(view==='week'){
+    var mon=WEEKS[weekIdx],sun=getSun(mon);
+    return RAW.filter(function(r){ return r.date>=mon&&r.date<=sun; });
+  }
+  return RAW.filter(function(r){ return r.date.indexOf(MONTHS[monthIdx])===0; });
+}
+function getNav(){
+  if(view==='day'){
+    var d=new Date(DAYS[dayIdx]+'T00:00:00');
+    return {p:d.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),r:''};
+  }
+  if(view==='week'){
+    var mon=new Date(WEEKS[weekIdx]+'T00:00:00'),sun=new Date(mon);sun.setDate(sun.getDate()+6);
+    return {p:'Semana del '+mon.toLocaleDateString('es-MX',{day:'numeric',month:'long'}),
+            r:mon.toLocaleDateString('es-MX',{day:'numeric',month:'short'})+' \u2014 '+sun.toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'})};
+  }
+  var ym=MONTHS[monthIdx].split('-'),d=new Date(parseInt(ym[0]),parseInt(ym[1])-1,1);
+  return {p:d.toLocaleDateString('es-MX',{month:'long',year:'numeric'}),r:'Mes completo'};
+}
+
+function renderKPIs(rows){
+  var ti=sum(rows,function(r){ return r.inv; });
+  var tc=sum(rows,function(r){ return r.agCRM; });
+  var tf=sum(rows,function(r){ return r.agFB; });
+  var cprCRM=tc>0?ti/tc:0, cprFB=tf>0?ti/tf:0;
+  var lbs={day:'Totales del d\u00eda',week:'Totales de la semana',month:'Totales del mes'};
+  var nav=getNav();
+  document.getElementById('mes-label').textContent=lbs[view]+' \u2014 '+nav.p;
+  document.getElementById('m-inv').textContent='$'+ti.toFixed(0);
+  document.getElementById('m-days').textContent=rows.length+(view==='day'?' registro':' d\u00edas');
+  document.getElementById('m-crm').textContent=tc;
+  document.getElementById('m-cxc').textContent='$'+cprCRM.toFixed(2)+' / agenda';
+  document.getElementById('m-fb').textContent=tf;
+  document.getElementById('m-cxf').textContent='$'+cprFB.toFixed(2)+' / agenda';
+  document.getElementById('m-ctr').textContent=avg(rows,function(r){ return r.ctr; }).toFixed(2)+'%';
+  document.getElementById('m-cpm').textContent='CPM: $'+avg(rows,function(r){ return r.cpm; }).toFixed(2);
+  document.getElementById('m-cpr-crm').textContent='$'+cprCRM.toFixed(2);
+  document.getElementById('m-cpr-crm').style.color=cprCRM<40?'#3fb950':cprCRM<60?'#d29922':'#f85149';
+  document.getElementById('m-crm-tot').textContent=tc+' agendas totales';
+  document.getElementById('m-cpr-fb').textContent='$'+cprFB.toFixed(2);
+  document.getElementById('m-cpr-fb').style.color=cprFB<40?'#3fb950':cprFB<60?'#d29922':'#f85149';
+  document.getElementById('m-fb-tot').textContent=tf+' agendas totales';
+  document.getElementById('m-imp').textContent=fmtK(sum(rows,function(r){ return r.imp; }));
+  document.getElementById('m-clics').textContent=fmtK(sum(rows,function(r){ return r.clics; }));
+  document.getElementById('m-cpc').textContent='CPC: $'+avg(rows,function(r){ return r.cpc; }).toFixed(2);
+  document.getElementById('m-vis').textContent=fmtK(sum(rows,function(r){ return r.vis; }));
+  document.getElementById('m-carga').textContent='Carga: '+avg(rows,function(r){ return r.carga; }).toFixed(1)+'%';
+  document.getElementById('m-conv').textContent=avg(rows,function(r){ return r.conv; }).toFixed(2)+'%';
+  document.getElementById('m-cpm2').textContent='$'+avg(rows,function(r){ return r.cpm; }).toFixed(2);
+  document.getElementById('m-cpc2').textContent='$'+avg(rows,function(r){ return r.cpc; }).toFixed(2);
+}
+
+function mkChart(id,labels,datasets){
+  var el=document.getElementById(id); if(!el) return;
+  var ex=Chart.getChart(el); if(ex) ex.destroy();
+  new Chart(el,{type:'bar',data:{labels:labels,datasets:datasets},options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1a1a',titleColor:'#999',bodyColor:'#ccc',borderColor:'#2a2a2a',borderWidth:1}},
+    scales:{
+      x:{ticks:{color:'#666',font:{family:'DM Mono',size:9},maxRotation:45,autoSkip:false},grid:{color:'#1a1a1a'}},
+      y:{ticks:{color:'#666',font:{family:'DM Mono',size:9}},grid:{color:'#1a1a1a'}}
+    }
+  }});
+}
+
+function render(){
+  var rows=getRows();
+  var nav=getNav();
+  renderKPIs(rows);
+  updateGauge();
+  document.getElementById('nav-period').textContent=nav.p;
+  document.getElementById('nav-range').textContent=nav.r;
+  var labels=rows.map(function(r){
+    var d=new Date(r.date+'T00:00:00');
+    return d.toLocaleDateString('es-MX',{weekday:'short',day:'numeric'});
+  });
+  mkChart('chart-inv',labels,[{
+    label:'Inversi\u00f3n',data:rows.map(function(r){ return +r.inv.toFixed(2); }),
+    backgroundColor:'rgba(212,175,55,0.2)',borderColor:'#D4AF37',borderWidth:2,borderRadius:4
+  }]);
+  mkChart('chart-ag',labels,[
+    {label:'CRM',data:rows.map(function(r){ return r.agCRM; }),backgroundColor:'rgba(99,153,34,0.4)',borderColor:'#639922',borderWidth:2,borderRadius:4},
+    {label:'FB', data:rows.map(function(r){ return r.agFB;  }),backgroundColor:'rgba(24,95,165,0.4)', borderColor:'#185FA5',borderWidth:2,borderRadius:4}
+  ]);
+  var titles={day:'Detalle del d\u00eda',week:'Detalle de la semana',month:'Detalle del mes'};
+  document.getElementById('tbl-title').textContent=titles[view];
+  var body=document.getElementById('dt-body');
+  body.innerHTML='';
+  rows.forEach(function(r){
+    var cprCRM=r.agCRM>0?(r.inv/r.agCRM).toFixed(2):'-';
+    var cprFB =r.agFB >0?(r.inv/r.agFB ).toFixed(2):'-';
+    var pCRM=getPill(parseFloat(cprCRM)||99);
+    var pFB =getPill(parseFloat(cprFB)||99);
+    var d=new Date(r.date+'T00:00:00');
+    var lbl=d.toLocaleDateString('es-MX',{weekday:'short',day:'numeric',month:'short'});
+    body.innerHTML+='<tr>'
+      +'<td class="gold">'+lbl+'</td>'
+      +'<td>$'+r.inv.toFixed(2)+'</td>'
+      +'<td>'+r.agCRM+'</td>'
+      +'<td><span class="pill '+pCRM+'">$'+cprCRM+'</span></td>'
+      +'<td>'+r.agFB+'</td>'
+      +'<td><span class="pill '+pFB+'">$'+cprFB+'</span></td>'
+      +'<td>'+fmtK(r.imp)+'</td>'
+      +'<td>'+r.ctr+'%</td>'
+      +'<td>$'+r.cpm+'</td>'
+      +'<td>'+r.clics+'</td>'
+      +'<td>'+r.vis+'</td>'
+      +'<td>'+r.carga+'%</td>'
+      +'<td>'+r.conv+'%</td>'
+      +'</tr>';
+  });
+}
+
+cargarDatos();
+window.addEventListener('load', function(){ drawGauge(0,'#D4AF37'); });
+</script>
+</body>
+</html>
