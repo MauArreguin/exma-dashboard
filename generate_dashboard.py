@@ -65,7 +65,7 @@ def fetch_daily_insights(campaign_id, since, until):
 def fetch_all():
     # Fetch from 365 days ago to today
     today = date.today()
-    since = (today - timedelta(since = '2026-01-01')).isoformat()
+    since = (today - timedelta(days=365)).isoformat()
     until = today.isoformat()
 
     combined_daily  = defaultdict(lambda: {'spend':0,'leads':0,'clicks':0,'impressions':0,'day':''})
